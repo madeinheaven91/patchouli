@@ -21,7 +21,7 @@ CREATE TABLE language (
 );
 
 CREATE TABLE book (
-	hash CHAR(64) PRIMARY KEY,
+	id CHAR(16) PRIMARY KEY,
 	file_path VARCHAR(128) NOT NULL UNIQUE,
 	title VARCHAR(255) NOT NULL,
 	description BPCHAR,
@@ -33,12 +33,12 @@ CREATE TABLE book (
 
 CREATE TABLE tag_to_book (
 	tag_id INTEGER,
-	book_hash VARCHAR(255),
-	PRIMARY KEY (tag_id, book_hash)
+	book_id VARCHAR(255),
+	PRIMARY KEY (tag_id, book_id)
 );
 
 CREATE TABLE author_to_book (
 	author_id INTEGER,
-	book_hash VARCHAR(255),
-	PRIMARY KEY (author_id, book_hash)
+	book_id VARCHAR(255),
+	PRIMARY KEY (author_id, book_id)
 );

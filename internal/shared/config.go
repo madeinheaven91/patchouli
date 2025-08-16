@@ -1,3 +1,6 @@
+// Package shared
+//
+// Shared stuff
 package shared
 
 import "os"

@@ -25,6 +25,8 @@ services:
       - "8080:3000"
     links:
       - "db:db"
+    volumes:
+      - books:/app/books
     environment:
       DB_USER: ${DB_USER}
       DB_PASS: ${DB_PASS}
@@ -40,3 +42,9 @@ volumes:
       o: bind
       type: none
       device: ./migrations
+  books:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ./books

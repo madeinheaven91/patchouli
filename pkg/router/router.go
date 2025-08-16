@@ -24,10 +24,12 @@ func (c *Router) BuildMux() *http.ServeMux {
 }
 
 type Route struct {
-	path      string
-	handler   http.Handler
-	method    string
-	subroutes []*Route
+	path            string
+	handler         http.HandlerFunc
+	method          string
+	subroutes       []*Route
+	middlewareChain []Middleware
+	stopMiddleware  bool
 }
 
 type defaultHandler struct{}
@@ -39,36 +41,65 @@ func (d defaultHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func NewRoute(path string) *Route {
 	return &Route{
 		path,
-		defaultHandler{},
+		defaultHandler{}.ServeHTTP,
 		"",
 		[]*Route{},
+		nil,
+		false,
 	}
 }
 
-func (r Route) buildSubroutes(mux *http.ServeMux, prefix string) {
-	newPath := prefix + r.path
-	mux.Handle(r.method+" "+newPath, r.handler)
-	for _, route := range r.subroutes {
+func (rt *Route) buildSubroutes(mux *http.ServeMux, prefix string) {
+	newPath := prefix + rt.path
+	mux.Handle(rt.method+" "+newPath, rt.buildChain())
+	// spew.Dump(rt.method+" "+newPath)
+	// spew.Dump(rt)
+
+	for _, route := range rt.subroutes {
+		if !route.stopMiddleware || rt.middlewareChain == nil {
+			route.middlewareChain = append(rt.middlewareChain, route.middlewareChain...)
+		}
+		// TODO: implement middleware propagation
 		go route.buildSubroutes(mux, newPath)
 	}
 }
 
-func (r *Route) Path(path string) *Route {
-	r.path = path
-	return r
+func (rt *Route) Path(path string) *Route {
+	rt.path = path
+	return rt
 }
 
-func (r *Route) Handler(handler http.Handler) *Route {
-	r.handler = handler
-	return r
+func (rt *Route) Handler(handler http.Handler) *Route {
+	rt.handler = handler.ServeHTTP
+	return rt
 }
 
-func (r *Route) Method(method string) *Route {
-	r.method = method
-	return r
+func (rt *Route) HandlerFunc(handler http.HandlerFunc) *Route {
+	rt.handler = handler
+	return rt
 }
 
-func (r *Route) Subroute(subroute *Route) *Route {
-	r.subroutes = append(r.subroutes, subroute)
-	return r
+func (rt *Route) Method(method string) *Route {
+	rt.method = method
+	return rt
+}
+
+func (rt *Route) Subroute(subroute *Route) *Route {
+	rt.subroutes = append(rt.subroutes, subroute)
+	return rt
+}
+
+func (rt *Route) Middleware(mw Middleware) *Route {
+	rt.middlewareChain = append(rt.middlewareChain, mw)
+	return rt
+}
+
+func (rt *Route) MiddlewareFunc(mw MiddlewareFunc) *Route {
+	rt.middlewareChain = append(rt.middlewareChain, basicWrapper{mw})
+	return rt
+}
+
+func (rt *Route) StopMiddleware() *Route {
+	rt.stopMiddleware = true
+	return rt
 }

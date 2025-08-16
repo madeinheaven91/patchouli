@@ -10,8 +10,8 @@ type Author struct {
 }
 
 type Book struct {
-	Hash         string
-	FilePath         string
+	ID           string
+	FilePath     string
 	Title        string
 	Description  string
 	Format       string
@@ -21,26 +21,26 @@ type Book struct {
 }
 
 type Category struct {
-	ID   int
-	Name string
+	ID   int    `json:"id"`
+	Name string `json:"name"`
 }
 
 type Tag struct {
-	ID   int
-	Name string
+	ID   int    `json:"id"`
+	Name string `json:"name"`
 }
 
 type TagToBook struct {
-	TagID    int
-	BookHash string
+	TagID  int    `json:"tag_id"`
+	BookID string `json:"book_id"`
 }
 
 type AuthorToBook struct {
-	AuthorID int
-	BookHash string
+	AuthorID int    `json:"author_id"`
+	BookID   string `json:"book_id"`
 }
 
 type Language struct {
-	Code string
-	Name string
+	Code string `json:"code"`
+	Name string `json:"name"`
 }

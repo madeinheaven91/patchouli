@@ -12,6 +12,7 @@ WORKDIR /app/cmd/catalog
 RUN CGO_ENABLED=0 GOOS=linux go build -o catalog
 
 EXPOSE 3000
+EXPOSE 8080
 
 WORKDIR /app/cmd/catalog
 CMD ["./catalog"]

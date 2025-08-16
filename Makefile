@@ -7,6 +7,9 @@ compose:
 	@docker compose down
 	docker-compose -f 'compose.yml' up -d --build
 
+bash-catalog:
+	@docker exec -it patch-catalog bash
+
 psql:
 	@docker exec -it patch-db psql -U ${DB_USER} -d ${DB_NAME}
 

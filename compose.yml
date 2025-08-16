@@ -11,20 +11,23 @@ services:
       restart: always
     volumes:
       - postgres-data:/var/lib/postgresql/data
-      - migrations:/migrations
+      - catalog-migrations:/migrations/catalog
+    networks:
+      - patch
     restart: unless-stopped
 
   catalog:
     container_name: patch-catalog
     build:
       context: ./
-      dockerfile: ./cmd/catalog/Dockerfile
+      dockerfile: ./dockerfiles/Catalog.dockerfile
     depends_on:
       - db
+    # FIXME: dont expose ports and use API gateway
     ports:
-      - "8080:3000"
-    links:
-      - "db:db"
+      - "8081:3000"
+    networks:
+      - patch
     volumes:
       - books:/app/books
     environment:
@@ -36,15 +39,18 @@ services:
 
 volumes:
   postgres-data:
-  migrations:
+  catalog-migrations:
     driver: local
     driver_opts:
       o: bind
       type: none
-      device: ./migrations
+      device: ./src/catalog/migrations
   books:
     driver: local
     driver_opts:
       o: bind
       type: none
-      device: ./books
+      device: ./src/catalog/books
+
+networks:
+  patch:

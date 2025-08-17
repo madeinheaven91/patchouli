@@ -1,7 +1,21 @@
 services:
+  caddy:
+    image: caddy
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+      - 80:80
+      - 443:443
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    networks:
+      - proxy
+
   db:
-    container_name: patch-db
     image: postgres
+    container_name: patch-db
+    restart: unless-stopped
     ports:
       - "${DB_PORT}:5432"
     environment:
@@ -13,21 +27,18 @@ services:
       - postgres-data:/var/lib/postgresql/data
       - catalog-migrations:/migrations/catalog
     networks:
-      - patch
-    restart: unless-stopped
+      - proxy
 
   catalog:
     container_name: patch-catalog
     build:
       context: ./
       dockerfile: ./dockerfiles/Catalog.dockerfile
+    restart: unless-stopped
     depends_on:
       - db
-    # FIXME: dont expose ports and use API gateway
-    ports:
-      - "8081:3000"
     networks:
-      - patch
+      - proxy
     volumes:
       - books:/app/books
     environment:
@@ -35,7 +46,6 @@ services:
       DB_PASS: ${DB_PASS}
       DB_NAME: catalog
       DB_PORT: ${DB_PORT}
-    restart: unless-stopped
 
 volumes:
   postgres-data:
@@ -53,4 +63,5 @@ volumes:
       device: ./src/catalog/books
 
 networks:
-  patch:
+  proxy:
+    name: proxy

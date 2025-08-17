@@ -1,0 +1,6 @@
+:8080 {
+	route /catalog/* {
+		uri strip_prefix /catalog
+		reverse_proxy catalog:3000
+	}
+}

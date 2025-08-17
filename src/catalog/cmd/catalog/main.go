@@ -14,68 +14,71 @@ func main() {
 	catalog.InitDB()
 
 	router := r.NewRouter(http.NewServeMux())
-	router.Route = r.NewRoute("/v1").
+	router.Route = r.NewRoute("/").
 		MiddlewareFunc(shared.LoggingMW).
 		Subroute(
-			r.NewRoute("/book").
-				Method("POST").
-				MiddlewareFunc(shared.AuthMW).
-				HandlerFunc(catalog.PostBook).
+			r.NewRoute("v1").
 				Subroute(
-					r.NewRoute("/{id}").
-						Method("GET").
-						StopMiddleware().
-						MiddlewareFunc(shared.LoggingMW).
-						HandlerFunc(catalog.GetBook),
+					r.NewRoute("/book").
+						Method("POST").
+						MiddlewareFunc(shared.AuthMW).
+						HandlerFunc(catalog.PostBook).
+						Subroute(
+							r.NewRoute("/{id}").
+								Method("GET").
+								StopMiddleware().
+								MiddlewareFunc(shared.LoggingMW).
+								HandlerFunc(catalog.GetBook),
+						).
+						Subroute(
+							r.NewRoute("/{id}/document").
+								Method("GET").
+								StopMiddleware().
+								MiddlewareFunc(shared.LoggingMW).
+								HandlerFunc(catalog.GetBookDocument),
+						),
 				).
 				Subroute(
-					r.NewRoute("/{id}/document").
-						Method("GET").
-						StopMiddleware().
-						MiddlewareFunc(shared.LoggingMW).
-						HandlerFunc(catalog.GetBookDocument),
-				),
-		).
-		Subroute(
-			r.NewRoute("/category").
-				Method("POST").
-				MiddlewareFunc(shared.AuthMW).
-				HandlerFunc(catalog.PostCategory).
-				Subroute(
-					r.NewRoute("/{id}").
-						Method("GET").
-						StopMiddleware().
-						MiddlewareFunc(shared.LoggingMW).
+					r.NewRoute("/category").
+						Method("POST").
 						MiddlewareFunc(shared.AuthMW).
-						HandlerFunc(catalog.GetCategory),
-				),
-		).
-		Subroute(
-			r.NewRoute("/tag").
-				Method("POST").
-				MiddlewareFunc(shared.AuthMW).
-				HandlerFunc(catalog.PostTag).
+						HandlerFunc(catalog.PostCategory).
+						Subroute(
+							r.NewRoute("/{id}").
+								Method("GET").
+								StopMiddleware().
+								MiddlewareFunc(shared.LoggingMW).
+								MiddlewareFunc(shared.AuthMW).
+								HandlerFunc(catalog.GetCategory),
+						),
+				).
 				Subroute(
-					r.NewRoute("/{id}").
-						Method("GET").
-						StopMiddleware().
-						MiddlewareFunc(shared.LoggingMW).
+					r.NewRoute("/tag").
+						Method("POST").
 						MiddlewareFunc(shared.AuthMW).
-						HandlerFunc(catalog.GetTag),
-				),
-		).
-		Subroute(
-			r.NewRoute("/author").
-				Method("POST").
-				MiddlewareFunc(shared.AuthMW).
-				HandlerFunc(catalog.PostAuthor).
+						HandlerFunc(catalog.PostTag).
+						Subroute(
+							r.NewRoute("/{id}").
+								Method("GET").
+								StopMiddleware().
+								MiddlewareFunc(shared.LoggingMW).
+								MiddlewareFunc(shared.AuthMW).
+								HandlerFunc(catalog.GetTag),
+						),
+				).
 				Subroute(
-					r.NewRoute("/{id}").
-						Method("GET").
-						StopMiddleware().
-						MiddlewareFunc(shared.LoggingMW).
+					r.NewRoute("/author").
+						Method("POST").
 						MiddlewareFunc(shared.AuthMW).
-						HandlerFunc(catalog.GetAuthor),
+						HandlerFunc(catalog.PostAuthor).
+						Subroute(
+							r.NewRoute("/{id}").
+								Method("GET").
+								StopMiddleware().
+								MiddlewareFunc(shared.LoggingMW).
+								MiddlewareFunc(shared.AuthMW).
+								HandlerFunc(catalog.GetAuthor),
+						),
 				),
 		)
 

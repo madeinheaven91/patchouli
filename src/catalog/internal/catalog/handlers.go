@@ -209,6 +209,7 @@ func GetAuthor(w http.ResponseWriter, r *http.Request) {
 	}
 	author, err := FetchAuthor(id, r.Context())
 	if err != nil {
+		shared.LogError(err)
 		w.WriteHeader(500)
 		return
 	}

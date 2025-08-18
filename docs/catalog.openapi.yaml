@@ -1,0 +1,110 @@
+openapi: 3.0.4
+info:
+  title: Bebra
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/catalog
+    description: Catalog microservice
+paths:
+  /v1/author/{id}:
+    get:
+      tags:
+        - Author
+      summary: Get an author by ID
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Author'
+  /v1/author:
+    post:
+      tags:
+        - Author
+      summary: Post a new author
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorForm'
+      responses:
+        '201':
+          description: Successfully posted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Author'
+  /v1/tag/{id}:
+    get:
+      tags:
+        - Tag
+      summary: Get a tag by ID
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+components:
+  schemas:
+    Author:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - photo_url
+      properties:
+        id:
+          type: id
+          format: int32
+          example: 1
+        name:
+          type: string
+          example: 'Arthur Schopenhauer'
+        description:
+          type: string
+          example: 'The first ghoul philosopher in the world'
+        photo_url:
+          type: string
+          example: 'https://photos.com/schopenhauer'
+    AuthorForm:
+      type: object
+      required:
+        - name
+        - description
+      properties:
+        name:
+          type: string
+          example: 'Arthur Schopenhauer'
+        description:
+          type: string
+          example: 'The first ghoul philosopher in the world'
+        photo_url:
+          type: string
+          example: 'https://photos.com/schopenhauer'
+    Tag:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+        name:
+          type: string

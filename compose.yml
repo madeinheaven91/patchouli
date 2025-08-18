@@ -1,4 +1,22 @@
+version: "3.8"
 services:
+  swagger-editor:
+      image: swaggerapi/swagger-editor
+      container_name: "swagger-editor"
+      ports:
+        - "8081:8080"
+
+  catalog-swagger:
+    image: swaggerapi/swagger-ui
+    container_name: "swagger-ui"
+    ports:
+      - "8082:8080"
+    volumes:
+      - ./docs/catalog.openapi.yaml:/catalog.openapi.yaml
+      - ./docs/comments.openapi.yaml:/comments.openapi.yaml
+    environment:
+      SWAGGER_JSON: /catalog.openapi.yaml
+         
   caddy:
     image: caddy
     container_name: caddy

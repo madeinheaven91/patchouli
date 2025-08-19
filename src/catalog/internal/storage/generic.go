@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/madeinheaven91/patchouli/internal/shared"
+	"catalog/internal/shared"
 )
 
 func Delete(table string, key string, value string, ctx context.Context) error {

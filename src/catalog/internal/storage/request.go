@@ -3,9 +3,9 @@ package storage
 import (
 	"context"
 
-	"github.com/madeinheaven91/patchouli/internal/models"
-	"github.com/madeinheaven91/patchouli/internal/service"
-	"github.com/madeinheaven91/patchouli/internal/shared"
+	"catalog/internal/models"
+	"catalog/internal/service"
+	"catalog/internal/shared"
 )
 
 // func FetchRequest(name string, ctx context.Context) (*models.Tag, error) {

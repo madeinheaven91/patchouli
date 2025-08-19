@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/madeinheaven91/patchouli/internal/service"
-	"github.com/madeinheaven91/patchouli/internal/shared"
+	"catalog/internal/service"
+	"catalog/internal/shared"
 )
 
 // NOTE: im not sure whether multipart upload is required, maybe ill implement it later

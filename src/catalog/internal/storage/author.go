@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 
-	"github.com/madeinheaven91/patchouli/internal/models"
-	"github.com/madeinheaven91/patchouli/internal/service"
-	"github.com/madeinheaven91/patchouli/internal/shared"
+	"catalog/internal/models"
+	"catalog/internal/service"
+	"catalog/internal/shared"
 )
 
 func FetchAuthor(id string, ctx context.Context) (*models.Author, error) {

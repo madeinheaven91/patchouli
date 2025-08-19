@@ -12,10 +12,10 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/madeinheaven91/hvnroutes/pkg/middlewares"
 	r "github.com/madeinheaven91/hvnroutes/pkg/router"
-	"github.com/madeinheaven91/patchouli/internal/handlers"
-	"github.com/madeinheaven91/patchouli/internal/service"
-	"github.com/madeinheaven91/patchouli/internal/shared"
-	"github.com/madeinheaven91/patchouli/internal/storage"
+	"catalog/internal/handlers"
+	"catalog/internal/service"
+	"catalog/internal/shared"
+	"catalog/internal/storage"
 )
 
 func main() {

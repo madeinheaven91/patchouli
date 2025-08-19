@@ -7,8 +7,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/madeinheaven91/patchouli/internal/models"
-	"github.com/madeinheaven91/patchouli/internal/shared"
+	"catalog/internal/models"
+	"catalog/internal/shared"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )

@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/madeinheaven91/patchouli/internal/service"
-	"github.com/madeinheaven91/patchouli/internal/shared"
-	"github.com/madeinheaven91/patchouli/internal/storage"
+	"catalog/internal/service"
+	"catalog/internal/shared"
+	"catalog/internal/storage"
 )
 
 func PostRequest(w http.ResponseWriter, r *http.Request) {

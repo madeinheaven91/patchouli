@@ -5,9 +5,9 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/madeinheaven91/patchouli/internal/service"
-	"github.com/madeinheaven91/patchouli/internal/shared"
-	"github.com/madeinheaven91/patchouli/internal/storage"
+	"catalog/internal/service"
+	"catalog/internal/shared"
+	"catalog/internal/storage"
 )
 
 func GetBook(w http.ResponseWriter, r *http.Request) {

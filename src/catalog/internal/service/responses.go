@@ -3,7 +3,7 @@ package service
 import (
 	"time"
 
-	"github.com/madeinheaven91/patchouli/internal/models"
+	"catalog/internal/models"
 )
 
 type RequestResponse struct {

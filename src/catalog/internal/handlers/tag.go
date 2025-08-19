@@ -5,9 +5,9 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/madeinheaven91/patchouli/internal/models"
-	"github.com/madeinheaven91/patchouli/internal/shared"
-	"github.com/madeinheaven91/patchouli/internal/storage"
+	"catalog/internal/models"
+	"catalog/internal/shared"
+	"catalog/internal/storage"
 )
 
 func GetTag(w http.ResponseWriter, r *http.Request) {

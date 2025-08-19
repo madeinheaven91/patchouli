@@ -1,4 +1,4 @@
-module github.com/madeinheaven91/patchouli
+module catalog
 
 go 1.24.6
 

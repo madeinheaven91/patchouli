@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/madeinheaven91/patchouli/internal/models"
-	"github.com/madeinheaven91/patchouli/internal/shared"
+	"catalog/internal/models"
+	"catalog/internal/shared"
 )
 
 func FetchTag(name string, ctx context.Context) (*models.Tag, error) {

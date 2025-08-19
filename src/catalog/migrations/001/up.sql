@@ -1,44 +1,50 @@
 CREATE TABLE author (
-	id SERIAL PRIMARY KEY,
+	id CHAR(8) PRIMARY KEY DEFAULT substr(md5(random()::text), 1, 8),
 	name VARCHAR(64) NOT NULL,
 	description BPCHAR NOT NULL,
 	photo_url VARCHAR(255)
 );
 
-CREATE TABLE category (
-	id SERIAL PRIMARY KEY,
-	name VARCHAR(32) NOT NULL
-);
-
-CREATE TABLE tag (
-	id SERIAL PRIMARY KEY,
-	name VARCHAR(32) NOT NULL
-);
-
-CREATE TABLE language (
-	code VARCHAR(8) PRIMARY KEY,
-	name VARCHAR(32) NOT NULL
-);
-
 CREATE TABLE book (
-	id CHAR(16) PRIMARY KEY,
-	file_path VARCHAR(128) NOT NULL UNIQUE,
-	title VARCHAR(255) NOT NULL,
+	id CHAR(8) PRIMARY KEY DEFAULT substr(md5(random()::text), 1, 8),
+	filename VARCHAR(144) NOT NULL UNIQUE,
+	title VARCHAR(128) NOT NULL,
 	description BPCHAR,
 	format VARCHAR(8) NOT NULL,
-	category_id INTEGER NOT NULL REFERENCES category(id),
-	language_code VARCHAR(8) NOT NULL REFERENCES language(code),
+	category VARCHAR(64) NOT NULL,
+	language_code VARCHAR(8) NOT NULL,
 	published TIMESTAMP DEFAULT NOW()
 );
 
+CREATE TABLE request (
+	id CHAR(8) PRIMARY KEY DEFAULT substr(md5(random()::text), 1, 8),
+	filename VARCHAR(144) NOT NULL UNIQUE,
+	title VARCHAR(128) NOT NULL,
+	author_name VARCHAR(64) NOT NULL,
+	description BPCHAR,
+	category VARCHAR(64) NOT NULL,
+	language_code VARCHAR(8) NOT NULL,
+	added TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE tag (
+	name VARCHAR(32) PRIMARY KEY
+);
+
+CREATE TABLE tag_to_request (
+	tag_name VARCHAR(32) REFERENCES tag(name) ON DELETE CASCADE,
+	request_id CHAR(8) REFERENCES request(id) ON DELETE CASCADE,
+	PRIMARY KEY (tag_name, request_id)
+);
+
 CREATE TABLE tag_to_book (
-	tag_id INTEGER,
-	book_id VARCHAR(255),
-	PRIMARY KEY (tag_id, book_id)
+	tag_name VARCHAR(32) REFERENCES tag(name) ON DELETE CASCADE,
+	book_id CHAR(8) REFERENCES book(id) ON DELETE CASCADE,
+	PRIMARY KEY (tag_name, book_id)
 );
 
 CREATE TABLE author_to_book (
-	author_id INTEGER,
-	book_id VARCHAR(255),
+	author_id CHAR(8) REFERENCES author(id) ON DELETE CASCADE,
+	book_id CHAR(8) REFERENCES book(id) ON DELETE CASCADE,
 	PRIMARY KEY (author_id, book_id)
 );

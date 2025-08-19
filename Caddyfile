@@ -1,6 +1,17 @@
 :8080 {
+	handle_path /minio-console/* {
+		reverse_proxy x-minio-common:9001
+	}
+	handle_path /minio/* {
+		uri strip_prefix /minio
+		reverse_proxy x-minio-common:9000
+	}
 	route /catalog/* {
 		uri strip_prefix /catalog
 		reverse_proxy catalog:3000
 	}
+    route /swagger/* {
+		uri strip_prefix /swagger
+        reverse_proxy swagger-ui:8080
+    }
 }

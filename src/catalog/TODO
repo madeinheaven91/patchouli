@@ -1,0 +1,8 @@
+1) make other crud operations for request
+	- delete
+	- fetch all
+	- fetch 1
+	- get document
+2) make request publishing
+	- request entry becomes a book entry with the same id
+	- all tags are transferred from tag_to_request to tag_to_book

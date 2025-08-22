@@ -30,3 +30,4 @@ func Delete(table string, key string, value string, ctx context.Context) error {
 	}
 	return err
 }
+

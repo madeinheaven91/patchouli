@@ -8,45 +8,53 @@ import (
 	"catalog/internal/shared"
 )
 
-// func FetchRequest(name string, ctx context.Context) (*models.Tag, error) {
-// 	conn, err := pool.Acquire(ctx)
-// 	if err != nil {
-// 		shared.LogError(err)
-// 		return nil, err
-// 	}
-// 	defer conn.Release()
-//
-// 	var tag models.Tag
-// 	row := conn.QueryRow(ctx, "SELECT * FROM tag WHERE name=$1", name)
-// 	err = row.Scan(&tag.Name)
-// 	return &tag, err
-// }
-//
-// func FetchRequestDocument(ctx context.Context) ([]models.Tag, error) {
-// 	conn, err := pool.Acquire(ctx)
-// 	if err != nil {
-// 		shared.LogError(err)
-// 		return nil, err
-// 	}
-// 	defer conn.Release()
-//
-// 	tags := make([]models.Tag, 0)
-// 	rows, err := conn.Query(ctx, "SELECT * FROM tag")
-// 	if err != nil {
-// 		shared.LogError(err)
-// 		return nil, err
-// 	}
-// 	for rows.Next() {
-// 		var tag models.Tag
-// 		errR := rows.Scan(&tag.Name)
-// 		if errR != nil {
-// 			shared.LogError(errR)
-// 			continue
-// 		}
-// 		tags = append(tags, tag)
-// 	}
-// 	return tags, nil
-// }
+func FetchRequest(id string, ctx context.Context) (*models.Request, error) {
+	conn, err := pool.Acquire(ctx)
+	if err != nil {
+		shared.LogError(err)
+		return nil, err
+	}
+	defer conn.Release()
+
+	var req models.Request
+	row := conn.QueryRow(ctx, "SELECT * FROM request WHERE id=$1", id)
+	err = row.Scan(&req.ID,
+		&req.Filename,
+		&req.Title,
+		&req.AuthorName,
+		&req.Description,
+		&req.Category,
+		&req.LanguageCode,
+		&req.Added)
+	return &req, err
+}
+
+func FetchAllRequests(ctx context.Context) ([]models.Request, error) {
+	conn, err := pool.Acquire(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Release()
+
+	var req models.Request
+	res := make([]models.Request, 0)
+	rows, err := conn.Query(ctx, "SELECT * FROM request")
+	for rows.Next() {
+		err = rows.Scan(&req.ID,
+			&req.Filename,
+			&req.Title,
+			&req.AuthorName,
+			&req.Description,
+			&req.Category,
+			&req.LanguageCode,
+			&req.Added)
+		if err != nil {
+			continue
+		}
+		res = append(res, req)
+	}
+	return res, err
+}
 
 func AddRequest(form service.RequestPostForm, ctx context.Context) (*models.Request, error) {
 	conn, err := pool.Acquire(ctx)

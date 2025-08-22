@@ -7,7 +7,6 @@ import (
 	"context"
 	"fmt"
 
-	"catalog/internal/models"
 	"catalog/internal/shared"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -29,25 +28,4 @@ func Init() {
 
 func Close() {
 	pool.Close()
-}
-
-func FetchBook(id string, ctx context.Context) (*models.Book, error) {
-	conn, err := pool.Acquire(ctx)
-	if err != nil {
-		shared.LogError(err)
-		return nil, err
-	}
-	defer conn.Release()
-
-	var book models.Book
-	row := conn.QueryRow(ctx, "SELECT * FROM book WHERE id=$1", id)
-	err = row.Scan(&book.ID,
-		&book.FilePath,
-		&book.Title,
-		&book.Description,
-		&book.Format,
-		&book.Category,
-		&book.LanguageCode,
-		&book.Published)
-	return &book, err
 }

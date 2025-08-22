@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"io"
 	"net/http"
 
 	"catalog/internal/service"
@@ -17,50 +16,129 @@ func GetBook(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(500)
 		return
 	}
+	// This shouldn't work, but anyway
 	if book == nil {
 		w.WriteHeader(404)
 		return
 	}
-	res, _ := json.Marshal(book)
-	w.Write(res)
+
+	tags, err := storage.FetchBookTags(book.ID, r.Context())
+	if err != nil {
+		shared.LogError(err)
+		shared.WriteError(w, 500, err)
+		return
+	}
+
+	res := service.BookResponseFromModel(*book, tags)
+	json, _ := json.Marshal(res)
+	w.Write(json)
 }
 
-func GetBookDocument(w http.ResponseWriter, r *http.Request) {
+func GetAllBooks(w http.ResponseWriter, r *http.Request) {
+	books, err := storage.FetchAllBooks(r.Context())
+	if err != nil {
+		shared.LogError(err)
+		w.WriteHeader(500)
+		return
+	}
+
+	res := make([]service.BookResponse, 0)
+	for _, book := range books {
+		tags, err := storage.FetchBookTags(book.ID, r.Context())
+		if err != nil {
+			shared.LogError(err)
+			shared.WriteError(w, 500, err)
+			return
+		}
+		resp := service.BookResponseFromModel(book, tags)
+		res = append(res, resp)
+	}
+
+	json, _ := json.Marshal(res)
+	w.Write(json)
+}
+
+func DeleteBook(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	book, err := storage.FetchBook(id, r.Context())
 	if err != nil {
 		shared.LogError(err)
-		w.WriteHeader(500)
+		shared.WriteError(w, 500, err)
 		return
 	}
-	if book == nil {
-		w.WriteHeader(404)
+	err = storage.Delete("book", "id", id, r.Context())
+	if err != nil {
+		shared.LogError(err)
+		shared.WriteError(w, 500, err)
 		return
 	}
 
-	bytes, err := service.FetchBookDocument(book.FilePath)
+	err = service.DeleteBook(book.Filename, r)
 	if err != nil {
 		shared.LogError(err)
-		w.WriteHeader(500)
+		shared.WriteError(w, 500, err)
 		return
 	}
-	res := service.EncodeDocument(bytes)
-	w.Write([]byte(res))
+
+	w.WriteHeader(204)
 }
 
-func PostBook(w http.ResponseWriter, r *http.Request) {
-	body, err := io.ReadAll(r.Body)
+func GetBookTags(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	book, err := storage.FetchBook(id, r.Context())
 	if err != nil {
 		shared.LogError(err)
-		w.WriteHeader(400)
+		shared.WriteError(w, 500, err)
 		return
 	}
-	defer r.Body.Close()
-	var form service.BookPostForm
-	err = json.Unmarshal(body, &form)
+
+	tags, err := storage.FetchBookTags(book.ID, r.Context())
 	if err != nil {
 		shared.LogError(err)
-		w.WriteHeader(400)
+		shared.WriteError(w, 500, err)
 		return
 	}
+
+	json, _ := json.Marshal(tags)
+	w.Write(json)
+}
+
+func PostBookTag(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	tag := r.URL.Query().Get("tag")
+
+	book, err := storage.FetchBook(id, r.Context())
+	if err != nil {
+		shared.LogError(err)
+		shared.WriteError(w, 500, err)
+		return
+	}
+	_, err = storage.AddTagToBook(tag, book.ID, r.Context())
+	if err != nil {
+		shared.LogError(err)
+		shared.WriteError(w, 500, err)
+		return
+	}
+
+	w.WriteHeader(201)
+}
+
+func DeleteBookTag(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	tag := r.URL.Query().Get("tag")
+
+	book, err := storage.FetchBook(id, r.Context())
+	if err != nil {
+		shared.LogError(err)
+		shared.WriteError(w, 500, err)
+		return
+	}
+	err = storage.DeleteTagToBook(tag, book.ID, r.Context())
+	if err != nil {
+		shared.LogError(err)
+		shared.WriteError(w, 500, err)
+		return
+	}
+
+	w.WriteHeader(204)
 }

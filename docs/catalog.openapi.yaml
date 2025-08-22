@@ -10,7 +10,9 @@ paths:
     post:
       tags:
         - Files
-      summary: Create a new file upload. Accepts data in various formats (plain text, html, md, pdf, doc, epub).
+      summary: >-
+        Create a new file upload. Accepts data in various formats (plain text,
+        html, md, pdf, doc, epub).
       requestBody:
         required: true
         content:
@@ -18,18 +20,7 @@ paths:
             schema:
               type: string
       responses:
-        '200':
-          description: Successfully posted
-          content:
-            application/json:
-              schema:
-                type: string
-    get:
-      tags:
-        - Files
-      summary: Get all files' info that MinIO provides
-      responses:
-        '200':
+        '201':
           description: Successfully posted
           content:
             application/json:
@@ -94,6 +85,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BookRequest'
+    get:
+      tags:
+        - Request
+      summary: Get all book requests
+      responses:
+        '200':
+          description: Successfully posted
   /v1/request/{id}:
     get:
       tags:
@@ -103,7 +101,7 @@ paths:
         - in: path
           name: id
           schema:
-            type: integer
+            type: string
           required: true
       responses:
         '200':
@@ -120,7 +118,7 @@ paths:
         - in: path
           name: id
           schema:
-            type: integer
+            type: string
           required: true
       responses:
         '204':
@@ -134,7 +132,7 @@ paths:
         - in: path
           name: id
           schema:
-            type: integer
+            type: string
           required: true
       responses:
         '200':
@@ -148,38 +146,146 @@ paths:
         - in: path
           name: id
           schema:
-            type: integer
+            type: string
           required: true
       responses:
         '200':
           description: Success TODO
-  /v1/request/{id}/tag:
+  /v1/request/{id}/tags:
     get:
       tags:
         - Request
-      summary: Get a book request by ID
+      summary: Get request tags
       parameters:
         - in: path
           name: id
           schema:
-            type: integer
+            type: string
           required: true
       responses:
         '200':
-          description: Success TODO
+          description: Success
     delete:
       tags:
         - Request
-      summary: Delete a books tag
+      summary: Delete a tag from request
       parameters:
         - in: path
           name: id
           schema:
-            type: integer
+            type: string
+          required: true
+        - in: query
+          name: tag
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Success
+    post:
+      summary: Add a tag to request
+      tags:
+        - Request
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: tag
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Success
+  /v1/book:
+    get:
+      tags:
+        - Books
+      summary: Get all books
+      responses:
+        '200':
+          description: Success
+  /v1/book/{id}:
+    get:
+      tags:
+        - Books
+      summary: Get a book by ID
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
           required: true
       responses:
         '200':
-          description: Success TODO
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+    delete:
+      tags:
+        - Books 
+      summary: Delete a book by ID
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        '204':
+          description: Successfully deleted
+  /v1/book/{id}/tags:
+    get:
+      tags:
+        - Books
+      summary: Get book tags
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Success
+    delete:
+      tags:
+        - Books
+      summary: Delete a tag from book
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: tag
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Success
+    post:
+      summary: Add a tag to book
+      tags:
+        - Books
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: tag
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Success
   /v1/author:
     post:
       tags:
@@ -198,6 +304,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Author'
+    get:
+      tags:
+        - Author
+      summary: Get all authors
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Author'
   /v1/author/{id}:
     get:
       tags:
@@ -207,7 +326,7 @@ paths:
         - in: path
           name: id
           schema:
-            type: integer
+            type: string
           required: true
       responses:
         '200':
@@ -229,20 +348,6 @@ paths:
       responses:
         '204':
           description: Successfully deleted
-  /v1/author/all:
-    get:
-      tags:
-        - Author
-      summary: Get all authors
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Author'
   /v1/tag:
     post:
       tags:
@@ -308,6 +413,47 @@ paths:
                   $ref: '#/components/schemas/Tag'
 components:
   schemas:
+    Book:
+      type: object
+      required:
+        - id
+        - filename
+        - title
+        - author_name
+        - description
+        - category
+        - language_code
+        - tags
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 1
+        filename:
+          type: string
+          example: s37djwf690seks23/doc.pdf
+        title:
+          type: string
+          example: Harry Potter
+        author_name:
+          type: string
+          example: J.K. Rowling
+        description:
+          type: string
+          example: Book about Harry Potter
+        category:
+          type: string
+          example: Fiction
+        language_code:
+          type: string
+          example: EN
+        tags:
+          type: array
+          items:
+            type: string
+          example:
+            - Fantasy
+            - Children
     BookRequest:
       type: object
       required:
@@ -344,7 +490,7 @@ components:
           example: EN
         tags:
           type: array
-          items: 
+          items:
             type: string
           example:
             - Fantasy
@@ -379,7 +525,7 @@ components:
           example: EN
         tags:
           type: array
-          items: 
+          items:
             type: string
           example:
             - Fantasy

@@ -179,7 +179,7 @@ func DeleteTagToBook(name string, bookID string, ctx context.Context) error {
 	defer conn.Release()
 
 	cmd, err := conn.Exec(ctx,
-		`DELETE FROM tag_to_book WHERE name=$1 and id=$2`,
+		`DELETE FROM tag_to_book WHERE tag_name=$1 and book_id=$2`,
 		name, bookID)
 	if err != nil {
 		shared.LogError(err)
@@ -200,7 +200,7 @@ func DeleteTagToRequest(name string, requestID string, ctx context.Context) erro
 	defer conn.Release()
 
 	cmd, err := conn.Exec(ctx,
-		`DELETE FROM tag_to_request WHERE name=$1 and id=$2`,
+		`DELETE FROM tag_to_request WHERE tag_name=$1 and request_id=$2`,
 		name, requestID)
 	if err != nil {
 		shared.LogError(err)

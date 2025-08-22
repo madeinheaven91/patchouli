@@ -9,13 +9,14 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/joho/godotenv"
-	"github.com/madeinheaven91/hvnroutes/pkg/middlewares"
-	r "github.com/madeinheaven91/hvnroutes/pkg/router"
 	"catalog/internal/handlers"
 	"catalog/internal/service"
 	"catalog/internal/shared"
 	"catalog/internal/storage"
+
+	"github.com/joho/godotenv"
+	"github.com/madeinheaven91/hvnroutes/pkg/middlewares"
+	r "github.com/madeinheaven91/hvnroutes/pkg/router"
 )
 
 func main() {
@@ -39,20 +40,27 @@ func main() {
 	router.Route = r.NewRoute("/v1", nil, "", logging, false).
 		Service(
 			r.NewRoute("/files", r.WrapHandler(handlers.UploadBookFile), "POST", auth, false).
-				Route("/{name}", r.WrapHandler(handlers.FetchBookFile), "GET").
+				Route("/{name}", r.WrapHandler(handlers.FetchBookFile), "GET", logging, true).
+				Route("/{name}", r.WrapHandler(handlers.DeleteBookFile), "DELETE").
 				Route("/{name}/info", r.WrapHandler(handlers.FetchBookFileInfo), "GET"),
 		).
 		Service(
-			r.NewRoute("/book", r.WrapHandler(handlers.PostBook), "POST", auth, false).
-				Route("/{id}", nil, "GET", logging, true).
-				Route("/{id}/document", nil, "GET", logging, true),
+			r.NewRoute("/book", r.WrapHandler(handlers.GetAllBooks), "GET").
+				Route("/{id}", r.WrapHandler(handlers.GetBook), "GET").
+				Route("/{id}", r.WrapHandler(handlers.DeleteBook), "DELETE", auth, false).
+				Route("/{id}/tags", r.WrapHandler(handlers.PostBookTag), "POST", auth, false).
+				Route("/{id}/tags", r.WrapHandler(handlers.GetBookTags), "GET").
+				Route("/{id}/tags", r.WrapHandler(handlers.DeleteBookTag), "DELETE", auth, false),
 		).
+		Route("/request", r.WrapHandler(handlers.GetAllRequests), "GET", auth, false).
 		Service(
 			r.NewRoute("/request", r.WrapHandler(handlers.PostRequest), "POST", auth, false).
-				Route("/{id}", nil, "GET", logging, true).
-				Route("/{id}", nil, "DELETE").
-				// Route("/{id}/tags", r.WrapHandler(handlers.PostTag), "POST").
-				Route("/{id}/publish", nil, "POST"),
+				Route("/{id}", r.WrapHandler(handlers.GetRequest), "GET").
+				Route("/{id}", r.WrapHandler(handlers.DeleteRequest), "DELETE").
+				Route("/{id}/tags", r.WrapHandler(handlers.PostRequestTag), "POST").
+				Route("/{id}/tags", r.WrapHandler(handlers.GetRequestTags), "GET").
+				Route("/{id}/tags", r.WrapHandler(handlers.DeleteRequestTag), "DELETE").
+				Route("/{id}/publish", r.WrapHandler(handlers.PublishRequest), "POST"),
 		).
 		Service(
 			r.NewRoute("/tag", r.WrapHandler(handlers.PostTag), "POST", auth, false).

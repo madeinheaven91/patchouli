@@ -12,8 +12,9 @@ type Author struct {
 
 type Book struct {
 	ID           string
-	FilePath     string
+	Filename     string
 	Title        string
+	AuthorName   string
 	Description  string
 	Format       string
 	Category     string
@@ -27,7 +28,6 @@ type Request struct {
 	Title        string
 	AuthorName   string
 	Description  string
-	Format       string
 	Category     string
 	LanguageCode string
 	Added        time.Time
@@ -35,6 +35,10 @@ type Request struct {
 
 type Tag struct {
 	Name string
+}
+
+func (t Tag) String() string {
+	return t.Name
 }
 
 type TagToBook struct {

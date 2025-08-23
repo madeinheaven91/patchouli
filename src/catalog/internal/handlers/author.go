@@ -14,7 +14,7 @@ func PostAuthor(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		shared.LogError(err)
-		w.WriteHeader(500)
+		shared.WriteError(w, 500, err)
 		return
 	}
 	defer r.Body.Close()
@@ -23,14 +23,14 @@ func PostAuthor(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(body, &form)
 	if err != nil {
 		shared.LogError(err, string(body))
-		w.WriteHeader(400)
+		shared.WriteError(w, 400, err)
 		return
 	}
 
 	author, err := storage.AddAuthor(form, r.Context())
 	if err != nil {
 		shared.LogError(err)
-		w.WriteHeader(500)
+		shared.WriteError(w, 500, err)
 		return
 	}
 	res, _ := json.Marshal(author)
@@ -41,7 +41,7 @@ func PostAuthor(w http.ResponseWriter, r *http.Request) {
 func GetAllAuthors(w http.ResponseWriter, r *http.Request) {
 	authors, err := storage.FetchAllAuthors(r.Context())
 	if err != nil {
-		w.WriteHeader(500)
+		shared.WriteError(w, 500, err)
 		return
 	}
 
@@ -54,11 +54,11 @@ func GetAuthor(w http.ResponseWriter, r *http.Request) {
 	author, err := storage.FetchAuthor(id, r.Context())
 	if err != nil {
 		shared.LogError(err)
-		w.WriteHeader(500)
+		shared.WriteError(w, 500, err)
 		return
 	}
 	if author == nil {
-		w.WriteHeader(404)
+		shared.WriteError(w, 404, err)
 		return
 	}
 
@@ -70,7 +70,7 @@ func DeleteAuthor(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	err := storage.DeleteAuthor(id, r.Context())
 	if err != nil {
-		w.WriteHeader(500)
+		shared.WriteError(w, 500, err)
 		return
 	}
 

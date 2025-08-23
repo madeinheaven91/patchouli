@@ -526,6 +526,21 @@ paths:
           $ref: '#/components/responses/404'
         '500':
           $ref: '#/components/responses/500'
+    get:
+      tags:
+        - Tag
+      summary: Get all tags
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tag'
+        '500':
+          $ref: '#/components/responses/500'
   /v1/tag/{name}:
     get:
       tags:
@@ -567,22 +582,6 @@ paths:
           $ref: '#/components/responses/403'
         '404':
           $ref: '#/components/responses/404'
-        '500':
-          $ref: '#/components/responses/500'
-  /v1/tag/all:
-    get:
-      tags:
-        - Tag
-      summary: Get all tags
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Tag'
         '500':
           $ref: '#/components/responses/500'
 components:

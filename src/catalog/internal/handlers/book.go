@@ -13,12 +13,12 @@ func GetBook(w http.ResponseWriter, r *http.Request) {
 	book, err := storage.FetchBook(r.PathValue("id"), r.Context())
 	if err != nil {
 		shared.LogError(err)
-		w.WriteHeader(500)
+		shared.WriteError(w, 500, err)
 		return
 	}
 	// This shouldn't work, but anyway
 	if book == nil {
-		w.WriteHeader(404)
+		shared.WriteError(w, 404, err)
 		return
 	}
 
@@ -38,7 +38,7 @@ func GetAllBooks(w http.ResponseWriter, r *http.Request) {
 	books, err := storage.FetchAllBooks(r.Context())
 	if err != nil {
 		shared.LogError(err)
-		w.WriteHeader(500)
+		shared.WriteError(w, 500, err)
 		return
 	}
 
@@ -105,7 +105,7 @@ func GetBookTags(w http.ResponseWriter, r *http.Request) {
 
 func PostBookTag(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	tag := r.URL.Query().Get("tag")
+	tag := r.PathValue("tag")
 
 	book, err := storage.FetchBook(id, r.Context())
 	if err != nil {
@@ -125,7 +125,7 @@ func PostBookTag(w http.ResponseWriter, r *http.Request) {
 
 func DeleteBookTag(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	tag := r.URL.Query().Get("tag")
+	tag := r.PathValue("tag")
 
 	book, err := storage.FetchBook(id, r.Context())
 	if err != nil {

@@ -50,7 +50,7 @@ type BookResponse struct {
 	ID           string
 	Filename     string
 	Title        string
-	AuthorName   string
+	AuthorID     string
 	Description  string
 	Category     string
 	LanguageCode string
@@ -63,7 +63,7 @@ func BookResponseFromModel[T string | models.Tag](model models.Book, tags []T) B
 		ID:           model.ID,
 		Filename:     model.Filename,
 		Title:        model.Title,
-		AuthorName:   model.AuthorName,
+		AuthorID:     model.AuthorID,
 		Description:  model.Description,
 		Category:     model.Category,
 		LanguageCode: model.LanguageCode,

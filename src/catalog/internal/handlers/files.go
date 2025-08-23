@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"catalog/internal/service"
 	"catalog/internal/shared"
@@ -15,9 +16,12 @@ import (
 func UploadBookFile(w http.ResponseWriter, r *http.Request) {
 	filename, err := service.UploadBook(r)
 	if err != nil {
-		// FIXME: it can be not only 500, depends on UploadBook output
+		status := 500
+		if strings.HasPrefix(err.Error(), "invalid mimetype") {
+			status = 400
+		}
 		shared.LogError(err)
-		w.WriteHeader(500)
+		shared.WriteError(w, status, err)
 		return
 	}
 	w.WriteHeader(201)
@@ -29,7 +33,7 @@ func FetchBookFile(w http.ResponseWriter, r *http.Request) {
 	obj, err := service.FetchBook(filename, r)
 	if err != nil {
 		shared.LogError(err)
-		w.WriteHeader(500)
+		shared.WriteError(w, 500, err)
 		return
 	}
 	defer obj.Close()
@@ -37,7 +41,7 @@ func FetchBookFile(w http.ResponseWriter, r *http.Request) {
 	stat, err := obj.Stat()
 	if err != nil {
 		shared.LogError(err)
-		w.WriteHeader(500)
+		shared.WriteError(w, 500, err)
 		return
 	}
 
@@ -49,7 +53,7 @@ func FetchBookFileInfo(w http.ResponseWriter, r *http.Request) {
 	obj, err := service.FetchBookStat(filename, r)
 	if err != nil {
 		shared.LogError(err)
-		w.WriteHeader(500)
+		shared.WriteError(w, 500, err)
 		return
 	}
 
@@ -62,7 +66,7 @@ func DeleteBookFile(w http.ResponseWriter, r *http.Request) {
 	obj, err := service.FetchBook(filename, r)
 	if err != nil {
 		shared.LogError(err)
-		w.WriteHeader(500)
+		shared.WriteError(w, 500, err)
 		return
 	}
 	defer obj.Close()
@@ -70,7 +74,7 @@ func DeleteBookFile(w http.ResponseWriter, r *http.Request) {
 	err = service.DeleteBook(filename, r)
 	if err != nil {
 		shared.LogError(err)
-		w.WriteHeader(500)
+		shared.WriteError(w, 500, err)
 		return
 	}
 	w.WriteHeader(204)

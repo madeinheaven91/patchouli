@@ -24,7 +24,7 @@ func WriteError(w http.ResponseWriter, statusCode int, message any) {
 	default:
 		msg = fmt.Sprintf("%v", v)
 	}
-	response := fmt.Sprintf(`{"status_code":"%d","message":"%v"}`, statusCode, msg)
+	response := fmt.Sprintf(`{"status_code":"%d","message":"%v"}`, statusCode, strings.ReplaceAll(msg, "\"", "'"))
 	w.WriteHeader(statusCode)
 	w.Write([]byte(response))
 }

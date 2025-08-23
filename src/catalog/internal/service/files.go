@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
@@ -54,8 +55,17 @@ func makeBucket(name string) error {
 	return nil
 }
 
-func generateFileName(data []byte) (string, string, error) {
-	mimetype := http.DetectContentType(data)
+func GenerateFileName(data []byte, header string) (string, string, error) {
+	detected := http.DetectContentType(data)
+	mimetype := detected
+
+	if strings.HasPrefix(header, "text") && !strings.HasPrefix(detected, "text") {
+		return "", detected, fmt.Errorf("wrong mimetype in header: %s, detected %s", header, detected)
+	}
+	if strings.HasPrefix(header, "text") {
+		mimetype = header
+	}
+
 	var suffix string
 	switch mimetype {
 	case "application/pdf":
@@ -75,10 +85,10 @@ func generateFileName(data []byte) (string, string, error) {
 	case "text/markdown", "text/markdown; charset=utf-8":
 		suffix = "md"
 	default:
-		return "", mimetype, fmt.Errorf("unsupported mimetype: %s", mimetype)
+		return "", detected, fmt.Errorf("unsupported mimetype: %s", detected)
 	}
 
-	filename := uuid.New().String() + "." + suffix
+	filename := "req_" + uuid.New().String() + "." + suffix
 	return filename, mimetype, nil
 }
 
@@ -89,11 +99,10 @@ func UploadBook(r *http.Request) (string, error) {
 	if err != nil && err != io.EOF {
 		return "", err
 	}
-	filename, contentType, err := generateFileName(data[:n])
+	filename, contentType, err := GenerateFileName(data[:n], r.Header.Get("Content-Type"))
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("invalid mimetype: %v", err)
 	}
-	filename = "req_" + filename
 
 	reader := io.MultiReader(bytes.NewReader(data[:n]), r.Body)
 

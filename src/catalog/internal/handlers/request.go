@@ -16,7 +16,7 @@ func PostRequest(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		shared.LogError(err)
-		w.WriteHeader(500)
+		shared.WriteError(w, 500, err)
 		return
 	}
 	defer r.Body.Close()
@@ -25,7 +25,7 @@ func PostRequest(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(body, &form)
 	if err != nil {
 		shared.LogError(err, string(body))
-		w.WriteHeader(400)
+		shared.WriteError(w, 400, err)
 		return
 	}
 
@@ -37,7 +37,7 @@ func PostRequest(w http.ResponseWriter, r *http.Request) {
 	_, err = service.RenameBook(newFilename, oldFilename, r)
 	if err != nil {
 		shared.LogError(err, fmt.Sprintf("%#v", form), string(body), newFilename)
-		w.WriteHeader(500)
+		shared.WriteError(w, 500, err)
 		return
 	}
 	form.Filename = newFilename
@@ -45,7 +45,7 @@ func PostRequest(w http.ResponseWriter, r *http.Request) {
 	request, err := storage.AddRequest(form, r.Context())
 	if err != nil {
 		shared.LogError(err)
-		w.WriteHeader(500)
+		shared.WriteError(w, 500, err)
 		return
 	}
 	for _, tag := range form.Tags {
@@ -146,7 +146,17 @@ func PublishRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	book, err := storage.AddBook(*req, r.Context())
+	author, err := storage.FetchAuthor(req.AuthorName, r.Context())
+	if err != nil {
+		author, err = storage.AddAuthor(service.AuthorPostForm{Name: req.AuthorName, Description: "", PhotoURL: ""}, r.Context())
+		if err != nil || author == nil{
+			shared.LogError(err)
+			shared.WriteError(w, 500, err)
+			return
+		}
+	}
+
+	book, err := storage.AddBook(*req, *author, r.Context())
 	if err != nil {
 		shared.LogError(err)
 		shared.WriteError(w, 500, err)
@@ -189,7 +199,7 @@ func GetRequestTags(w http.ResponseWriter, r *http.Request) {
 
 func PostRequestTag(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	tag := r.URL.Query().Get("tag")
+	tag := r.PathValue("tag")
 
 	req, err := storage.FetchRequest(id, r.Context())
 	if err != nil {
@@ -209,7 +219,7 @@ func PostRequestTag(w http.ResponseWriter, r *http.Request) {
 
 func DeleteRequestTag(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	tag := r.URL.Query().Get("tag")
+	tag := r.PathValue("tag")
 
 	req, err := storage.FetchRequest(id, r.Context())
 	if err != nil {

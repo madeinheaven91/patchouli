@@ -20,7 +20,7 @@ func FetchBook(id string, ctx context.Context) (*models.Book, error) {
 	err = row.Scan(&book.ID,
 		&book.Filename,
 		&book.Title,
-		&book.AuthorName,
+		&book.AuthorID,
 		&book.Description,
 		&book.Category,
 		&book.LanguageCode,
@@ -42,7 +42,7 @@ func FetchAllBooks(ctx context.Context) ([]models.Book, error) {
 		err = rows.Scan(&book.ID,
 			&book.Filename,
 			&book.Title,
-			&book.AuthorName,
+			&book.AuthorID,
 			&book.Description,
 			&book.Category,
 			&book.LanguageCode,
@@ -55,7 +55,7 @@ func FetchAllBooks(ctx context.Context) ([]models.Book, error) {
 	return res, err
 }
 
-func AddBook(form models.Request, ctx context.Context) (*models.Book, error) {
+func AddBook(request models.Request, author models.Author, ctx context.Context) (*models.Book, error) {
 	conn, err := pool.Acquire(ctx)
 	if err != nil {
 		shared.LogError(err)
@@ -65,10 +65,10 @@ func AddBook(form models.Request, ctx context.Context) (*models.Book, error) {
 
 	var book models.Book
 	row := conn.QueryRow(ctx,
-		`INSERT INTO book (id, filename, title, author_name, description, category, language_code) 
+		`INSERT INTO book (id, filename, title, author_id, description, category, language_code) 
 		VALUES ($1, $2, $3, $4, $5, $6, $7) 
 	RETURNING *;`,
-		form.ID, form.Filename, form.Title, form.AuthorName, form.Description, form.Category, form.LanguageCode)
-	err = row.Scan(&book.ID, &book.Filename, &book.Title, &book.AuthorName, &book.Description, &book.Category, &book.LanguageCode, &book.Published)
+		request.ID, request.Filename, request.Title, author.ID, request.Description, request.Category, request.LanguageCode)
+	err = row.Scan(&book.ID, &book.Filename, &book.Title, &book.AuthorID, &book.Description, &book.Category, &book.LanguageCode, &book.Published)
 	return &book, err
 }

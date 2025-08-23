@@ -14,7 +14,7 @@ type Book struct {
 	ID           string
 	Filename     string
 	Title        string
-	AuthorName   string
+	AuthorID     string
 	Description  string
 	Format       string
 	Category     string
@@ -42,12 +42,12 @@ func (t Tag) String() string {
 }
 
 type TagToBook struct {
-	TagName   string `json:"tag_name"`
-	BookID string `json:"book_id"`
+	TagName string `json:"tag_name"`
+	BookID  string `json:"book_id"`
 }
 
 type TagToRequest struct {
-	TagName      string `json:"tag_name"`
+	TagName   string `json:"tag_name"`
 	RequestID string `json:"request_id"`
 }
 

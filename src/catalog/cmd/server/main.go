@@ -48,31 +48,31 @@ func main() {
 			r.NewRoute("/book", r.WrapHandler(handlers.GetAllBooks), "GET").
 				Route("/{id}", r.WrapHandler(handlers.GetBook), "GET").
 				Route("/{id}", r.WrapHandler(handlers.DeleteBook), "DELETE", auth, false).
-				Route("/{id}/tags", r.WrapHandler(handlers.PostBookTag), "POST", auth, false).
 				Route("/{id}/tags", r.WrapHandler(handlers.GetBookTags), "GET").
-				Route("/{id}/tags", r.WrapHandler(handlers.DeleteBookTag), "DELETE", auth, false),
+				Route("/{id}/tags/{tag}", r.WrapHandler(handlers.PostBookTag), "POST", auth, false).
+				Route("/{id}/tags/{tag}", r.WrapHandler(handlers.DeleteBookTag), "DELETE", auth, false),
 		).
 		Route("/request", r.WrapHandler(handlers.GetAllRequests), "GET", auth, false).
 		Service(
 			r.NewRoute("/request", r.WrapHandler(handlers.PostRequest), "POST", auth, false).
 				Route("/{id}", r.WrapHandler(handlers.GetRequest), "GET").
 				Route("/{id}", r.WrapHandler(handlers.DeleteRequest), "DELETE").
-				Route("/{id}/tags", r.WrapHandler(handlers.PostRequestTag), "POST").
 				Route("/{id}/tags", r.WrapHandler(handlers.GetRequestTags), "GET").
-				Route("/{id}/tags", r.WrapHandler(handlers.DeleteRequestTag), "DELETE").
+				Route("/{id}/tags/{tag}", r.WrapHandler(handlers.PostRequestTag), "POST").
+				Route("/{id}/tags/{tag}", r.WrapHandler(handlers.DeleteRequestTag), "DELETE").
 				Route("/{id}/publish", r.WrapHandler(handlers.PublishRequest), "POST"),
 		).
 		Service(
 			r.NewRoute("/tag", r.WrapHandler(handlers.PostTag), "POST", auth, false).
+				Route("", r.WrapHandler(handlers.GetAllTags), "GET", logging, true).
 				Route("/{name}", r.WrapHandler(handlers.DeleteTag), "DELETE").
-				Route("/{name}", r.WrapHandler(handlers.GetTag), "GET", logging, true).
-				Route("/all", r.WrapHandler(handlers.GetAllTags), "GET", logging, true),
+				Route("/{name}", r.WrapHandler(handlers.GetTag), "GET", logging, true),
 		).
 		Service(
 			r.NewRoute("/author", r.WrapHandler(handlers.PostAuthor), "POST", auth, false).
+				Route("", r.WrapHandler(handlers.GetAllAuthors), "GET", logging, true).
 				Route("/{id}", r.WrapHandler(handlers.DeleteAuthor), "DELETE").
-				Route("/{id}", r.WrapHandler(handlers.GetAuthor), "GET", logging, true).
-				Route("/all", r.WrapHandler(handlers.GetAllAuthors), "GET", logging, true),
+				Route("/{id}", r.WrapHandler(handlers.GetAuthor), "GET", logging, true),
 		)
 
 	server := http.Server{

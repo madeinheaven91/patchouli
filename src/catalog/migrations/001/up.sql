@@ -9,7 +9,7 @@ CREATE TABLE book (
 	id CHAR(8) PRIMARY KEY DEFAULT substr(md5(random()::text), 1, 8),
 	filename VARCHAR(144) NOT NULL UNIQUE,
 	title VARCHAR(128) NOT NULL,
-	author_name VARCHAR(64) NOT NULL,
+	author_id CHAR(8) NOT NULL REFERENCES author(id) ON DELETE RESTRICT,
 	description BPCHAR,
 	category VARCHAR(64) NOT NULL,
 	language_code VARCHAR(8) NOT NULL,
